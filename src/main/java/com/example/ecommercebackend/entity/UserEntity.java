@@ -2,6 +2,7 @@ package com.example.ecommercebackend.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,9 +34,11 @@ public class UserEntity implements UserDetails {
 
     private Integer age;*/
 
+    @NotBlank
     @Email
     private String email;
 
+    @NotBlank
     public String password;
 
     @Enumerated(EnumType.STRING)

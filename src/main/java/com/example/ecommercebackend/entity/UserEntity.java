@@ -1,5 +1,6 @@
 package com.example.ecommercebackend.entity;
 
+import com.example.ecommercebackend.entity.enums.RoleType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -21,64 +22,27 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "users")
-public class UserEntity implements UserDetails {
+public class UserEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-   /* @Column(name = "first_name")
-    private String firstName;
+    @Column(unique = true, nullable = false)
+    public String username;
 
-    @Column(name = "last_name")
-    private String lastName;
-
-    private Integer age;*/
-
-    @NotBlank
-    @Email
-    private String email;
-
-    @NotBlank
+    @Column(nullable = false)
     public String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "role_id", nullable = false)
+    private RoleEntity role;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE"+ role.name()));
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
-    public enum Role {
-        ADMIN,
-        CUSTOMER;
+    public UserEntity(String username, String password, RoleEntity role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
     }
 }

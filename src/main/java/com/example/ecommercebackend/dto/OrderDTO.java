@@ -20,5 +20,6 @@ public class OrderDTO {
     private LocalDate createdAt;
 
     private Long userId;
+
     private List<OrderItemDTO> orderItems;
 }

@@ -17,4 +17,6 @@ public interface IUserService {
 
     @Transactional
     void deleteById(Long id);
+
+    boolean existsByUsername(String username);
 }

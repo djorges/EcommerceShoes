@@ -1,6 +1,7 @@
 package com.example.ecommercebackend.dto;
 
 import com.example.ecommercebackend.entity.Order;
+import com.example.ecommercebackend.entity.enums.OrderStatus;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -16,7 +17,8 @@ public class OrderDTO {
     @NotBlank(message = "Phone number is required")
     private String phoneNumber;
 
-    private Order.OrderStatus status;
+    private OrderStatus status;
+
     private LocalDate createdAt;
 
     private Long userId;

@@ -1,5 +1,6 @@
 package com.example.ecommercebackend.utils;
 
+import com.example.ecommercebackend.repository.ITokenRepository;
 import com.example.ecommercebackend.service.UserServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,7 +11,6 @@ import lombok.val;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -21,6 +21,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserServiceImpl userService;
+    private final ITokenRepository tokenRepository; //TODO: Create token service
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -36,15 +37,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userService.loadUserByUsername(userName);
 
-            if(jwtUtil.validateToken(jwtToken, userDetails)) {
+            boolean isValidToken = jwtUtil.validateToken(jwtToken, userDetails);
+            boolean isStoredTokenValid = tokenRepository.findByToken(jwtToken)
+                    .map( t -> !t.isRevoked() && !t.isExpired())
+                    .orElse(false);
 
-                val usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+            if(isValidToken && isStoredTokenValid) {
+
+                val authenticationToken = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()
                 );
-                usernamePasswordAuthenticationToken.setDetails(userDetails);
+                authenticationToken.setDetails(userDetails);
 
-
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
 

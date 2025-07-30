@@ -39,7 +39,7 @@ public class SecurityConfig {
         http.cors(AbstractHttpConfigurer::disable)//TODO: Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/auth/**").permitAll()
+                        auth.requestMatchers("/auth/login", "/auth/register").permitAll()
                             .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

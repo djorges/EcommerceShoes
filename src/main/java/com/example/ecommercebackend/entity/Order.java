@@ -2,6 +2,7 @@ package com.example.ecommercebackend.entity;
 
 
 import com.example.ecommercebackend.dto.OrderItemDTO;
+import com.example.ecommercebackend.entity.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,13 +31,6 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-
-    public enum OrderStatus {
-        PENDING,
-        CONFIRMED,
-        CANCELLED,
-        FINISHED;
-    }
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> itemList = new ArrayList<>();

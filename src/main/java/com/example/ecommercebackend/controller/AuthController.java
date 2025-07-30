@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -37,15 +36,15 @@ public class AuthController {
     /**
      * TODO: Create reset password method
      * */
-    /* TODO: logout
-         https://medium.com/@klcberat13/jwt-authentication-and-secure-logout-in-spring-boot-e9dcff2cc677
-    * */
+
+
     @PostMapping("/logout")
     public ResponseEntity<String> logout(
         HttpServletRequest request,
         HttpServletResponse response
     ) {
         authService.logout(request, response);
+
         return ResponseEntity.ok("Logout successful");
     }
 }

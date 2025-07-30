@@ -3,8 +3,10 @@ package com.example.ecommercebackend.service;
 
 import com.example.ecommercebackend.dto.NewUserDTO;
 import com.example.ecommercebackend.entity.RoleEntity;
+import com.example.ecommercebackend.entity.TokenEntity;
 import com.example.ecommercebackend.entity.UserEntity;
 import com.example.ecommercebackend.entity.enums.RoleType;
+import com.example.ecommercebackend.repository.ITokenRepository;
 import com.example.ecommercebackend.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,14 +16,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements IAuthService {
+    private final ITokenRepository tokenRepository; //TODO: Create token service
     private final UserServiceImpl userService;
     private final IRoleService roleService;
     private final JwtUtil jwtUtil;
@@ -35,7 +39,26 @@ public class AuthServiceImpl implements IAuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authResult);
 
-        return jwtUtil.generateToken(authResult);
+        String name = authResult.getName();
+        UserEntity user = userService.findByUsername(name);
+        // Revocar tokens anteriores
+        List<TokenEntity> validTokens = tokenRepository.findAllByUserAndRevokedFalseAndExpiredFalse(user);
+        validTokens.forEach(t -> {
+            t.setRevoked(true);
+            t.setExpired(true);
+        });
+        tokenRepository.saveAll(validTokens);
+
+        // Guardar nuevo token
+        String jwt = jwtUtil.generateToken(authResult);
+        TokenEntity tokenEntity = new TokenEntity();
+        tokenEntity.setToken(jwt);
+        tokenEntity.setUser(user);
+        tokenEntity.setRevoked(false);
+        tokenEntity.setExpired(false);
+        tokenRepository.save(tokenEntity);
+
+        return jwt;
     }
 
     @Override
@@ -56,35 +79,26 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
-       /* Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             val authHeader = request.getHeader("Authorization");
-            String jwtToken = null;
-            String userName = null;
+
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                jwtToken = authHeader.substring(7);
-                userName = jwtUtil.getUsername(jwtToken);
+                String jwtToken = authHeader.substring(7);
+                String userName = jwtUtil.getUsername(jwtToken);
+
+                UserEntity user = userService.findByUsername(userName);
+                List<TokenEntity> validTokens = tokenRepository.findAllByUserAndRevokedFalseAndExpiredFalse(user);
+                validTokens.forEach(t -> {
+                    t.setRevoked(true);
+                    t.setExpired(true);
+                });
+                tokenRepository.saveAll(validTokens);
+
+                new SecurityContextLogoutHandler().logout(request, response, authentication);
             }
-
-            if(userName != null) {
-                UserDetails userDetails = userService.loadUserByUsername(userName);
-
-                if (jwtUtil.validateToken(jwtToken, userDetails)) {
-                    //TODO:
-                     RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                    // If no matching token is found, throws an exception for a non-existing refresh token
-                    .orElseThrow(() -> new BusinessException(ERROR, REFRESH_TOKEN_DOES_NOT_EXIST));
-
-                    // Sets the status of the found refresh token to REVOKED, marking it as unusable
-                    refreshToken.setRefreshTokenStatus(RefreshTokenStatus.REVOKED);
-
-                    // Saves the updated refresh token back to the database to persist the status change
-                    refreshTokenRepository.save(refreshToken);
-                    new SecurityContextLogoutHandler().logout(request, response, authentication);
-                }
-            }
-        }*/
-        return "";
+        }
     }
 }

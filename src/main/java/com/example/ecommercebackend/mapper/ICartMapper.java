@@ -5,8 +5,6 @@ import com.example.ecommercebackend.dto.CartDTO;
 import com.example.ecommercebackend.entity.Cart;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
-
 
 
 /* TODO: Create Cart, Order, Product, mapper
@@ -14,13 +12,13 @@ import org.mapstruct.factory.Mappers;
         CartDto cartDto = CartMapper.INSTANCE.toDto( cart );
 
 */
-@Mapper(componentModel = "spring", uses = {CartItemMapper.class})
-public interface CartMapper {
-    CartMapper INSTANCE = Mappers.getMapper( CartMapper.class );
+/*
+@Mapper(componentModel = "spring", uses = {ICartItemMapper.class})
+public interface ICartMapper {
 
     @Mapping(source = "user.id", target = "userId")
     CartDTO toDTO(Cart cart);
 
     @Mapping(source = "userId", target = "user.id")
     Cart toEntity(CartDTO dto);
-}
+}*/

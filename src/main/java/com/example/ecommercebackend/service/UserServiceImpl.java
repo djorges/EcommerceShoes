@@ -49,9 +49,7 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        val user = repository.findByUsername(username).orElseThrow(
-            () -> new UsernameNotFoundException("User " + username + " not found")
-        );
+        val user = findByUsername(username);
         val authority = new SimpleGrantedAuthority(user.getRole().getName().name());
 
         return new User(
@@ -64,5 +62,12 @@ public class UserServiceImpl implements IUserService, UserDetailsService {
     @Override
     public boolean existsByUsername(String username) {
         return repository.existsByUsername(username);
+    }
+
+    @Override
+    public UserEntity findByUsername(String username) {
+        return repository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("User " + username + " not found")
+        );
     }
 }

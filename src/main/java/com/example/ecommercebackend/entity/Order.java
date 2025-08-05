@@ -33,5 +33,5 @@ public class Order {
     private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> itemList = new ArrayList<>();
+    private List<OrderItem> items = new ArrayList<>();
 }

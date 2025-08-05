@@ -12,7 +12,6 @@ import org.mapstruct.Mapping;
         CartDto cartDto = CartMapper.INSTANCE.toDto( cart );
 
 */
-/*
 @Mapper(componentModel = "spring", uses = {ICartItemMapper.class})
 public interface ICartMapper {
 
@@ -21,4 +20,4 @@ public interface ICartMapper {
 
     @Mapping(source = "userId", target = "user.id")
     Cart toEntity(CartDTO dto);
-}*/
+}

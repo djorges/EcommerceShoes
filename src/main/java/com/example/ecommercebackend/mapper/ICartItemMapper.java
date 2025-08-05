@@ -5,7 +5,8 @@ import com.example.ecommercebackend.entity.CartItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/*
+
+
 @Mapper(componentModel = "spring")
 public interface ICartItemMapper {
 
@@ -14,4 +15,4 @@ public interface ICartItemMapper {
 
     @Mapping(source = "productId", target = "product.id")
     CartItem toEntity(CartItemDTO dto);
-}*/
+}

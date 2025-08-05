@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-/*@Mapper(componentModel = "spring", uses = {IOrderItemMapper.class})
+@Mapper(componentModel = "spring", uses = {IOrderItemMapper.class})
 public interface IOrderMapper {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "items", target = "orderItems")
@@ -20,4 +20,4 @@ public interface IOrderMapper {
     List<OrderDTO> toDTOs(List<Order> orders);
 
     List<Order> toEntities(List<OrderDTO> orderDTOs);
-}*/
+}

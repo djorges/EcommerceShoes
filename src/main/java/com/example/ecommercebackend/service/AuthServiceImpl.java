@@ -1,7 +1,8 @@
 package com.example.ecommercebackend.service;
 
 
-import com.example.ecommercebackend.dto.NewUserDTO;
+import com.example.ecommercebackend.dto.ChangePasswordReqDTO;
+import com.example.ecommercebackend.dto.NewUserReqDTO;
 import com.example.ecommercebackend.entity.RoleEntity;
 import com.example.ecommercebackend.entity.TokenEntity;
 import com.example.ecommercebackend.entity.UserEntity;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -42,6 +44,7 @@ public class AuthServiceImpl implements IAuthService {
         String name = authResult.getName();
         UserEntity user = userService.findByUsername(name);
         // Revocar tokens anteriores
+        //TODO: add not found token exception
         List<TokenEntity> validTokens = tokenRepository.findAllByUserAndRevokedFalseAndExpiredFalse(user);
         validTokens.forEach(t -> {
             t.setRevoked(true);
@@ -62,19 +65,30 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public void register(NewUserDTO newUserDTO) {
-        if(userService.existsByUsername(newUserDTO.getUsername())) {
+    public void register(NewUserReqDTO newUserReqDTO) {
+        if(userService.existsByUsername(newUserReqDTO.getUsername())) {
             throw new IllegalArgumentException("Username is already in use");
         }
 
         RoleEntity roleUser = roleService.findByName(RoleType.USER);
 
         UserEntity user = new UserEntity(
-            newUserDTO.getUsername(),
-            passwordEncoder.encode(newUserDTO.getPassword()),
+            newUserReqDTO.getUsername(),
+            passwordEncoder.encode(newUserReqDTO.getPassword()),
             roleUser
         );
 
+        userService.save(user);
+    }
+
+    @Override
+    public void changePassword(String email, ChangePasswordReqDTO request){
+        val user = userService.findByUsername(email);
+        if(!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userService.save(user);
     }
 

@@ -1,6 +1,7 @@
 package com.example.ecommercebackend.controller;
 
-import com.example.ecommercebackend.dto.NewUserDTO;
+import com.example.ecommercebackend.dto.ChangePasswordReqDTO;
+import com.example.ecommercebackend.dto.NewUserReqDTO;
 import com.example.ecommercebackend.service.IAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,24 +20,38 @@ public class AuthController {
     private final IAuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody NewUserDTO newUserDTO) {
-        String jwt = authService.login(newUserDTO.getUsername(), newUserDTO.getPassword());
+    public ResponseEntity<String> login(
+            @Valid @RequestBody NewUserReqDTO newUserReqDTO
+    ) {
+        String jwt = authService.login(newUserReqDTO.getUsername(), newUserReqDTO.getPassword());
 
         return ResponseEntity.ok(jwt);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody NewUserDTO newUserDTO) {
-        authService.register(newUserDTO);
+    public ResponseEntity<String> register(
+        @Valid @RequestBody NewUserReqDTO newUserReqDTO
+    ) {
+        authService.register(newUserReqDTO);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body("User registered successfully");
     }
     /**
-     * TODO: Create reset password method
+     * TODO: Test change password method
+     * http://localhost:8080/auth/change-password?email=
+     *
      * */
+    @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @RequestParam String email,
+            @RequestBody ChangePasswordReqDTO request
+    ) {
+        authService.changePassword(email, request);
 
+        return ResponseEntity.ok("Password changed successfully");
+    }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(

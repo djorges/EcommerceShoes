@@ -38,6 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails = userService.loadUserByUsername(userName);
 
             boolean isValidToken = jwtUtil.validateToken(jwtToken, userDetails);
+            //TODO: add not found token exception
             boolean isStoredTokenValid = tokenRepository.findByToken(jwtToken)
                     .map( t -> !t.isRevoked() && !t.isExpired())
                     .orElse(false);

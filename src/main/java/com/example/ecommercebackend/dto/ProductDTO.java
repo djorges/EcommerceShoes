@@ -19,6 +19,7 @@ public class ProductDTO {
     private Double price;
     @PositiveOrZero(message = "Cannot be negative")
     private Integer quantity;
+    private String image;
 
     private List<CommentDTO> commentDTOList;
 }

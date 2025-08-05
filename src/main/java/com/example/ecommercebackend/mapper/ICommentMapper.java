@@ -5,7 +5,7 @@ import com.example.ecommercebackend.entity.Comment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/*@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring")
 public interface ICommentMapper {
     @Mapping(source = "user.id", target = "userId")
     CommentDTO toDto(Comment comment);
@@ -13,4 +13,4 @@ public interface ICommentMapper {
     @Mapping(source = "userId", target = "user.id")
     @Mapping(target = "product", ignore = true)
     Comment toEntity(CommentDTO commentDTO);
-}*/
+}
